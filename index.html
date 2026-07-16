@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Sistema de pedidos MQTT para demonstração de fábrica no Meta Ray-Ban Display.">
+    <meta name="mrbd-web-app-capable" content="yes">
+    <title>Sistema de Pedidos | Eldorado</title>
+    <link rel="icon" type="image/png" href="./assets/eldorado-logo.png">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./vendor/mqtt.min.js" defer></script>
+    <script src="./config.js" defer></script>
+    <script src="./timestamp-service.js" defer></script>
+    <script src="./mqtt-service.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="display-shell" id="displayApp" tabindex="-1" aria-label="Sistema de pedidos da fábrica">
+      <div class="ambient-grid" aria-hidden="true"></div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+        <span class="toast-icon" id="toastIcon" aria-hidden="true">•</span>
+        <span id="toastMessage"></span>
+      </div>
+
+      <div class="sr-only" id="connectionLive" role="status" aria-live="polite"></div>
+      <div class="sr-only" id="orderLive" role="status" aria-live="polite"></div>
+
+      <section class="screen screen-connection is-active" id="connectionScreen" data-screen="connection" aria-hidden="false">
+        <header class="brand-header motion-item">
+          <div class="brand-mark brand-mark-large">
+            <img src="./assets/eldorado-logo.png" alt="Instituto Eldorado">
+            <strong class="logo-fallback">Eldorado</strong>
+          </div>
+          <span class="brand-rule" aria-hidden="true"></span>
+          <p class="eyebrow">Sistema de Pedidos</p>
+          <h1>Conexão com a fábrica</h1>
+        </header>
+
+        <div class="connection-console motion-item" id="connectionConsole">
+          <div class="connection-summary">
+            <div class="signal-orbit" aria-hidden="true">
+              <span class="signal-core"></span>
+              <span class="signal-ring signal-ring-one"></span>
+              <span class="signal-ring signal-ring-two"></span>
+              <span class="signal-spinner"></span>
+            </div>
+            <div class="connection-copy">
+              <span class="status-pill is-connecting" id="connectionPill">
+                <span class="status-dot"></span>
+                <span id="connectionPillText">CONECTANDO</span>
+              </span>
+              <strong id="connectionTitle">Iniciando comunicação</strong>
+              <p id="connectionDescription">Estabelecendo comunicação com o sistema…</p>
+            </div>
+          </div>
+
+          <div class="connection-details" id="connectionDetails" aria-hidden="true">
+            <div class="details-heading">
+              <strong>Diagnóstico da conexão</strong>
+              <span id="detailsSecurityBadge">WS</span>
+            </div>
+            <dl class="diagnostics-grid">
+              <div><dt>Broker</dt><dd id="detailBroker">—</dd></div>
+              <div><dt>Client ID</dt><dd id="detailClientId">—</dd></div>
+              <div><dt>Tentativa</dt><dd id="detailAttempt">0</dd></div>
+              <div><dt>Estado</dt><dd id="detailState">iniciando</dd></div>
+              <div><dt>Última tentativa</dt><dd id="detailLastAttempt">—</dd></div>
+              <div><dt>Próxima tentativa</dt><dd id="detailNextAttempt">—</dd></div>
+              <div><dt>Rede do aparelho</dt><dd id="detailOnline">—</dd></div>
+              <div><dt>Página</dt><dd id="detailPageProtocol">—</dd></div>
+            </dl>
+            <p class="diagnostic-error" id="detailLastError">Nenhum erro registrado.</p>
+          </div>
+        </div>
+
+        <button class="details-toggle focusable" id="detailsToggle" type="button" aria-expanded="false" aria-controls="connectionDetails">
+          <span class="keycap">ENTER</span>
+          <span id="detailsToggleLabel">detalhes da conexão</span>
+        </button>
+      </section>
+
+      <section class="screen screen-order" id="orderScreen" data-screen="order" aria-hidden="true">
+        <header class="order-header motion-item">
+          <div class="brand-mark brand-mark-small">
+            <img src="./assets/eldorado-logo.png" alt="Instituto Eldorado">
+            <strong class="logo-fallback">Eldorado</strong>
+          </div>
+          <div class="order-heading">
+            <span class="brand-rule brand-rule-small" aria-hidden="true"></span>
+            <p class="eyebrow">Solicitação de peça</p>
+          </div>
+          <span class="connection-chip" id="connectionChip" role="status" aria-live="polite">
+            <span class="connection-chip-dot" aria-hidden="true"></span>
+            <span id="connectionChipText">ONLINE</span>
+          </span>
+        </header>
+
+        <div class="order-main">
+          <div class="carousel-stage motion-item" id="carouselStage" aria-label="Carrossel de peças">
+            <button class="carousel-arrow carousel-arrow-left focusable" id="previousButton" type="button" aria-label="Peça anterior" tabindex="-1">‹</button>
+            <button class="carousel-arrow carousel-arrow-right focusable" id="nextButton" type="button" aria-label="Próxima peça" tabindex="-1">›</button>
+
+            <div class="carousel-track" id="carouselTrack">
+              <button class="piece-card piece-white focusable" type="button" data-card-type="WHITE" tabindex="-1">
+                <span class="card-index">01</span>
+                <span class="industrial-piece" aria-hidden="true"><span></span></span>
+                <span class="card-label">Branca</span>
+                <span class="card-code">WHITE</span>
+              </button>
+              <button class="piece-card piece-red focusable" type="button" data-card-type="RED" tabindex="-1">
+                <span class="card-index">02</span>
+                <span class="industrial-piece" aria-hidden="true"><span></span></span>
+                <span class="card-label">Vermelha</span>
+                <span class="card-code">RED</span>
+              </button>
+              <button class="piece-card piece-blue focusable" type="button" data-card-type="BLUE" tabindex="-1">
+                <span class="card-index">03</span>
+                <span class="industrial-piece" aria-hidden="true"><span></span></span>
+                <span class="card-label">Azul</span>
+                <span class="card-code">BLUE</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="selection-summary motion-item">
+            <strong class="selected-piece-name" id="selectedName">Peça Branca</strong>
+            <span class="selected-piece-code" id="selectedType">WHITE</span>
+            <p class="navigation-hint">← → navegar <i>·</i> ↑ selecionar</p>
+          </div>
+
+          <div class="order-action-area motion-item" id="orderActionWrap">
+            <div class="request-button-shell">
+              <button class="primary-button order-button focusable" id="orderButton" type="button">REQUISITAR</button>
+            </div>
+            <p class="factory-feedback" id="factoryFeedback" aria-live="polite">Simulador pronto para receber</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="modal-layer" id="modalLayer" hidden>
+        <div class="modal-backdrop" aria-hidden="true"></div>
+        <section class="confirmation-modal" id="confirmationDialog" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle" aria-describedby="confirmationDescription" tabindex="-1">
+          <span class="modal-kicker">Validação necessária</span>
+          <h2 id="confirmationTitle">Confirmar solicitação?</h2>
+          <div class="modal-piece-row">
+            <span class="modal-piece piece-white" id="modalPiece" aria-hidden="true"><span class="industrial-piece"><span></span></span></span>
+            <p id="confirmationDescription">Deseja requisitar uma unidade da peça BRANCA?</p>
+          </div>
+          <p class="modal-technical">Tipo MQTT: <strong id="modalType">WHITE</strong></p>
+          <div class="modal-actions" aria-label="Ações de confirmação">
+            <button class="danger-button modal-action is-selected focusable" id="cancelButton" type="button" data-modal-action="cancel">CANCELAR</button>
+            <button class="primary-button modal-action focusable" id="confirmButton" type="button" data-modal-action="confirm">CONFIRMAR</button>
+          </div>
+          <p class="modal-hint">← → escolher · ENTER confirmar · ↓ cancelar</p>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
