@@ -10,7 +10,7 @@
     debug: true,
 
     mqtt: {
-      url: "wss://localhost:9443",
+      url: "wss://192.168.2.106:9443",
       protocolVersion: 4,
       clientIdPrefix: "eldorado-rb-display",
       clean: true,
