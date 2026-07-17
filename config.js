@@ -10,7 +10,7 @@
     debug: true,
 
     mqtt: {
-      url: "ws://127.0.0.1:9001",
+      url: "wss://127.0.0.1:9443",
       protocolVersion: 4,
       clientIdPrefix: "eldorado-rb-display",
       clean: true,
