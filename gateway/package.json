@@ -1,0 +1,20 @@
+{
+  "name": "eldorado-factory-24v-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gateway HTTP/WebSocket para MQTT TCP da fischertechnik Training Factory 24 V.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "simulation": "node src/simulation/fake-factory.js",
+    "test": "node --test --test-isolation=none test/*.test.js",
+    "test:integration": "node --test --test-isolation=none test/integration/*.test.js"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "mqtt": "5.15.2",
+    "ws": "8.21.1"
+  }
+}

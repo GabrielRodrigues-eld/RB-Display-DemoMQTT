@@ -23,7 +23,7 @@ if not exist "%MOSQUITTO_EXE%" (
 :run
 echo Iniciando broker MQTT da demonstração...
 echo TCP local: 127.0.0.1:1883
-echo WebSocket: 0.0.0.0:9001
+echo Acesso restrito ao notebook; não existe listener WebSocket MQTT.
 echo Configuração: %SCRIPT_DIR%mosquitto.conf
 echo.
 "%MOSQUITTO_EXE%" -c "%SCRIPT_DIR%mosquitto.conf" -v

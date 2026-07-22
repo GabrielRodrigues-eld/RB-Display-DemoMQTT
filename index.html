@@ -3,15 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no">
-    <meta name="description" content="Sistema de pedidos MQTT para demonstração de fábrica no Meta Ray-Ban Display.">
+    <meta name="description" content="Sistema de pedidos para a fischertechnik Training Factory 24 V no Meta Ray-Ban Display.">
     <meta name="mrbd-web-app-capable" content="yes">
     <title>Sistema de Pedidos | Eldorado</title>
     <link rel="icon" type="image/png" href="./assets/eldorado-logo.png">
     <link rel="stylesheet" href="./styles.css">
-    <script src="./vendor/mqtt.min.js" defer></script>
     <script src="./config.js" defer></script>
-    <script src="./timestamp-service.js" defer></script>
-    <script src="./mqtt-service.js" defer></script>
+    <script src="./gateway-service.js" defer></script>
     <script src="./app.js" defer></script>
   </head>
   <body>
@@ -34,7 +32,7 @@
           </div>
           <span class="brand-rule" aria-hidden="true"></span>
           <p class="eyebrow">Sistema de Pedidos</p>
-          <h1>Conexão com a fábrica</h1>
+          <h1>Conexão com o gateway</h1>
         </header>
 
         <div class="connection-console motion-item" id="connectionConsole">
@@ -51,22 +49,22 @@
                 <span id="connectionPillText">CONECTANDO</span>
               </span>
               <strong id="connectionTitle">Iniciando comunicação</strong>
-              <p id="connectionDescription">Estabelecendo comunicação com o sistema…</p>
+              <p id="connectionDescription">Localizando o gateway do notebook…</p>
             </div>
           </div>
 
           <div class="connection-details" id="connectionDetails" aria-hidden="true">
             <div class="details-heading">
               <strong>Diagnóstico da conexão</strong>
-              <span id="detailsSecurityBadge">WS</span>
+              <span id="detailsSecurityBadge">HTTP + WS</span>
             </div>
             <dl class="diagnostics-grid">
-              <div><dt>Broker</dt><dd id="detailBroker">—</dd></div>
-              <div><dt>Client ID</dt><dd id="detailClientId">—</dd></div>
-              <div><dt>Tentativa</dt><dd id="detailAttempt">0</dd></div>
-              <div><dt>Estado</dt><dd id="detailState">iniciando</dd></div>
+              <div><dt>Gateway</dt><dd id="detailBroker">—</dd></div>
+              <div><dt>MQTT Client ID</dt><dd id="detailClientId">—</dd></div>
+              <div><dt>Tentativa WS</dt><dd id="detailAttempt">0</dd></div>
+              <div><dt>Gateway / MQTT</dt><dd id="detailState">iniciando</dd></div>
               <div><dt>Última tentativa</dt><dd id="detailLastAttempt">—</dd></div>
-              <div><dt>Próxima tentativa</dt><dd id="detailNextAttempt">—</dd></div>
+              <div><dt>Broker MQTT</dt><dd id="detailNextAttempt">—</dd></div>
               <div><dt>Rede do aparelho</dt><dd id="detailOnline">—</dd></div>
               <div><dt>Página</dt><dd id="detailPageProtocol">—</dd></div>
             </dl>
@@ -125,7 +123,10 @@
 
           <div class="selection-summary motion-item">
             <strong class="selected-piece-name" id="selectedName">Peça Branca</strong>
-            <span class="selected-piece-code" id="selectedType">WHITE</span>
+            <div class="selection-meta">
+              <span class="selected-piece-code" id="selectedType">WHITE</span>
+              <span class="selected-stock-count" id="selectedStockCount" role="status" aria-live="polite" aria-label="Estoque da peça selecionada">—</span>
+            </div>
             <p class="navigation-hint">← → navegar <i>·</i> ↑ selecionar</p>
           </div>
 
@@ -133,7 +134,7 @@
             <div class="request-button-shell">
               <button class="primary-button order-button focusable" id="orderButton" type="button">REQUISITAR</button>
             </div>
-            <p class="factory-feedback" id="factoryFeedback" aria-live="polite">Simulador pronto para receber</p>
+            <p class="factory-feedback" id="factoryFeedback" aria-live="polite">Aguardando estado da fábrica</p>
           </div>
         </div>
       </section>
@@ -147,7 +148,7 @@
             <span class="modal-piece piece-white" id="modalPiece" aria-hidden="true"><span class="industrial-piece"><span></span></span></span>
             <p id="confirmationDescription">Deseja requisitar uma unidade da peça BRANCA?</p>
           </div>
-          <p class="modal-technical">Tipo MQTT: <strong id="modalType">WHITE</strong></p>
+          <p class="modal-technical">Pedido Factory 24 V: <strong id="modalType">WHITE</strong></p>
           <div class="modal-actions" aria-label="Ações de confirmação">
             <button class="danger-button modal-action is-selected focusable" id="cancelButton" type="button" data-modal-action="cancel">CANCELAR</button>
             <button class="primary-button modal-action focusable" id="confirmButton" type="button" data-modal-action="confirm">CONFIRMAR</button>

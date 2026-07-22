@@ -894,6 +894,11 @@ dd {
   text-align: center;
 }
 
+.piece-card.is-out-of-stock.position-center {
+  border-color: rgba(255, 107, 107, 0.42);
+  filter: grayscale(0.42);
+}
+
 .selected-piece-name {
   display: block;
   width: 100%;
@@ -902,15 +907,46 @@ dd {
   text-align: center;
 }
 
+.selection-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 18px;
+}
+
 .selected-piece-code {
-  display: block;
-  width: 100%;
   color: var(--eldorado-orange-soft);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.14em;
   line-height: 1.2;
-  text-align: center;
+}
+
+.selected-stock-count {
+  display: inline-grid;
+  min-width: 22px;
+  height: 17px;
+  place-items: center;
+  padding: 0 6px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 760;
+  line-height: 1;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.selected-stock-count[data-state="empty"] {
+  border-color: rgba(255, 107, 107, 0.24);
+  background: rgba(255, 107, 107, 0.06);
+  color: #ff9a9a;
+}
+
+.selected-stock-count[data-state="unavailable"] {
+  color: var(--text-muted);
 }
 
 .navigation-hint {
