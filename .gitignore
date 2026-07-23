@@ -1,15 +1,32 @@
-node_modules/
-.npm-cache/
-*.log
-*.zip
-
+# Local environment files
 .env
-.env.*
-!.env.example
-!.env.*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.factory.example
 
-.agents/
-.codex/
+# Node.js dependencies and local package cache
+node_modules/
+**/node_modules/
+.npm-cache/
+**/.npm-cache/
+.npm/
+**/.npm/
 
+# Logs and local runtime artifacts
+*.log
+**/*.log
+coverage/
+**/coverage/
+dist/
+**/dist/
+build/
+**/build/
+.cache/
+**/.cache/
+
+# OS/editor leftovers
 .DS_Store
+**/.DS_Store
 Thumbs.db
+**/Thumbs.db
